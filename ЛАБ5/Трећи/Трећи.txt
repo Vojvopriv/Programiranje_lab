@@ -1,0 +1,76 @@
+//3. Napisati program koji omogućava unos proizvoljnog broja cjelobrojnih podataka putem standardnog
+//   ulaza, snimanje unesenih podataka sortiranih u opadajućem redoslijedu u binarnu datoteku i prikaz
+//   cjelobrojnih podataka iz binarne datoteke na standardnom izlazu.
+//   Unos novih podataka:
+//   Podaci se snimaju u binarnu datoteku koja se prosljeđuje kao prvi argument komandne linije.
+//   Čitanje podataka:
+//   Podaci se čitaju iz datoteke čiji se naziv unosi putem standardnog ulaza ili iz datoteke koja se
+//   prosljeđuje kao prvi argument komandne linije ukoliko se za naziv datoteke navede znak „#“.
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int main(int argc, char *argv[])
+{
+    if (argc < 2) return (printf("Nedovoljno argumenata.\n"), -1);
+    FILE *dat;
+    int i, j, n=0, *niz, p, br;
+    char s[15];
+
+    if( (dat = fopen(argv[1],"wb")) != NULL) {
+        do {
+            printf("Koliko brojeva: ");
+            scanf("%d", &n);
+        } while(n<1);
+
+        niz = (int *)malloc(n*sizeof(int));
+        for(i=0; i<n; i++) {
+            printf("Unesite %d. clan niza: ",i+1);
+            scanf("%d", &niz[i]);
+        }
+        for(i=0; i<n-1; i++) {
+            for(j=i+1; j<n; j++) {
+                if(niz[i] < niz[j]) {
+                    int temp = niz[i];
+                    niz[i] = niz[j];
+                    niz[j] = temp;
+                }
+            }
+        }
+        p = fwrite(niz, sizeof(int), n, dat);
+        fclose(dat);
+    }
+    else return (printf("Neuspjesno upisivanje u datoteku.\n"), -1);
+
+    i=0;
+    if( strcmp("#.dat",argv[1]) == 0 ) {
+        if( (dat = fopen(argv[1],"rb")) != NULL) {
+            do {
+                p = fread(&br, sizeof(int), 1, dat);
+                if(p)   niz[i++] = br;
+            } while(p);
+
+            for(i=0; i<n; i++) {
+                printf(" %d",niz[i]);
+            }
+        }
+    }
+    else {i=0;
+        printf("Naziv datoteke: "); scanf("%s", s);
+        if( (dat=fopen(s,"rb")) != NULL) {
+            do {
+                p = fread(&br, sizeof(int), 1, dat);
+                if(p) niz[i++] = br;
+            } while(p);
+            for(i=0; i<n; i++) {
+                printf(" %d",niz[i]);
+            }
+        }
+        else return (printf("Greska u otvaranju datoteke %s\n", s), -1);
+    }
+
+
+    free(niz);niz = NULL;
+    return 0;
+}

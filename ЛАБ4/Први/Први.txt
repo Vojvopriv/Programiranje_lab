@@ -1,0 +1,60 @@
+//1. Napisati program koji iz datoteke čiji je naziv prvi argument komandne linije, čita riječi i upisuje ih
+//   (svaku riječ u zasebnom redu) u datoteku čiji je naziv drugi argument komandne linije. Pored toga,
+//   program treba da na standardni izlaz ispiše najdužu riječ. Riječ je jedno ili više uzastopnih slova od
+//   drugih riječi odvojena znakom koje nije slovo.
+
+#include <stdio.h>
+#include <string.h>
+
+int main(int argc, char *argv[])
+{
+    if(argc < 3) return (printf("Nedovoljno argumenata!"), -1);
+
+    FILE *dat1, *dat2;
+    int i, k=0, max=0;
+    char c, s[100], najveci[100];
+
+    if( (dat1 = fopen(argv[1],"r")) !=NULL ) {
+        if( (dat2 = fopen(argv[2],"w")) !=NULL ) {
+            while( (c = fgetc(dat1)) != EOF ) {
+                if( (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ) {
+                    k=0;
+                    fputc(c,dat2);
+                }
+                else {
+                    k++;
+                    if(k==1) {
+                        fprintf(dat2,"\n");
+                    }
+                }
+            }
+
+            fclose(dat2);
+        }
+        else return (printf("Neuspjesno upisivanje u b.txt"), -1);
+
+        fclose(dat1);
+    }
+    else return (printf("Neuspjesno ocitavanje a.txt"), -1);
+
+    if( (dat2 = fopen(argv[2],"r")) != NULL ) {
+        while( fgets(s, 100, dat2) != NULL) {
+            if( strlen(s) >= max) {
+                max = strlen(s);
+                for(i=0; i<max; i++) {
+                    najveci[i] = s[i];
+                }
+            }
+        }
+        fclose(dat2);
+    }
+    else return (printf("Neuspjesno otvaranje datoteke b.txt"), -1);
+
+    printf("Najduza rijec je: ");
+    for(i=0; i<strlen(najveci); i++)
+        if( (najveci[i] >= 'A' && najveci[i] <= 'Z') || (najveci[i] >= 'a' && najveci[i] <= 'z') )
+            printf("%c", najveci[i]);
+    printf("\n");
+
+    return 0;
+}
